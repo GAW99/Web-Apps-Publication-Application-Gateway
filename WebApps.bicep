@@ -264,7 +264,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           protocol: 'Https'   
           timeout: 30
           interval:30
-          unhealthyThreshold: 5          
+          unhealthyThreshold: 5           
         }
       }
       {
@@ -603,7 +603,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
             id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', '${service}_AppGW', 'CA_Pool')
           }
           backendHttpSettings: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', '${service}_AppGW', 'CA_HTTPS_Settings_1')
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', '${service}_AppGW', 'CA_HTTP_Settings_1')
           }
         }
       }
