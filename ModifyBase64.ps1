@@ -1,9 +1,8 @@
 #. ($PSScriptRoot+"\ESAE.ps1")
-$filename = "CA IIS Private Certificate.cer"
+$filename = "Exch Internal Certificate Base 64.cer"
 $OutputFileName = $filename.Substring(0,$filename.IndexOf('.'))+"_Alligned.txt"
 
 $fileContentBytes = Get-Content -Path $($PSScriptRoot+'\'+$FileName)
-$fileContentBytes.Length
 
 $Temp2 =  [System.Collections.Generic.List[System.Object]]$fileContentBytes
 $Temp2.RemoveAt($Temp2.Count-1)

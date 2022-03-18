@@ -106,7 +106,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         }
       }    
       {
-        name: 'Exch_Pool'
+        name: 'EXCH_Pool'
         properties:{          
           backendAddresses: [
             {
@@ -349,7 +349,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -365,7 +365,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -381,7 +381,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -397,7 +397,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -413,7 +413,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -429,7 +429,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -445,7 +445,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -461,7 +461,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/EXCH_IIS_Int_Cert_1'                          
             }
           ]
         }
@@ -485,6 +485,12 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         name: 'SSL_Cert_Ext_WildName'
         properties:{
           data: 'MIIFGjCCBAKgAwIBAgISA341bfvZO4crGotsFmc3NPRTMA0GCSqGSIb3DQEBCwUAMDIxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQDEwJSMzAeFw0yMjAyMTQwOTA3MzRaFw0yMjA1MTUwOTA3MzNaMBUxEzARBgNVBAMMCiouZ2F3MDAudGswggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCODm20FY7AZmDJ9ywoTpbV0QKDlsF3rtaGMDuDlhtx5NWky/gxULqARvosJQ3Apc2FtHFxT0VzIkM2qlAR9/bZuY/FzeZ0Tf44kvXyupvfSMCUDbY2hvoEA5vsC5aMqpYnEEOQkG576EozEojZrARbGuhfrpgyGRAJwfmfIBdd+XJMvZ0PzNeD5jB3IsJ7ebOP5hXQv84U6cNC8c/seYf2v7d+aQhflt+ocBevyMT+WMNFL8tWnwgrh0mNvw86YW7O+9eHUT8bvO50SlxAlfxaGcg3M6NsRQZAJyxyccgEUtiPXPtNlZuRTzI+VprA7/iRt0+WxKktlxdzixQvDdsJAgMBAAGjggJFMIICQTAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFKJHZ64qCQJYP0/INOphCjtPtCjDMB8GA1UdIwQYMBaAFBQusxe3WFbLrlAJQOYfr52LFMLGMFUGCCsGAQUFBwEBBEkwRzAhBggrBgEFBQcwAYYVaHR0cDovL3IzLm8ubGVuY3Iub3JnMCIGCCsGAQUFBzAChhZodHRwOi8vcjMuaS5sZW5jci5vcmcvMBUGA1UdEQQOMAyCCiouZ2F3MDAudGswTAYDVR0gBEUwQzAIBgZngQwBAgEwNwYLKwYBBAGC3xMBAQEwKDAmBggrBgEFBQcCARYaaHR0cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcwggEEBgorBgEEAdZ5AgQCBIH1BIHyAPAAdgDfpV6raIJPH2yt7rhfTj5a6s2iEqRqXo47EsAgRFwqcwAAAX73s64pAAAEAwBHMEUCIQDgPk5ATzmq/cpOERCzQi80zEIVmxIqakJXvUgGVGMl5wIgNM7dr5jGvfimvFlUl9PuHzUxZFKRcXxQnTep1uT1MswAdgBGpVXrdfqRIDC1oolp9PN9ESxBdL79SbiFq/L8cP5tRwAAAX73s65RAAAEAwBHMEUCIQCIOdmnYlttLw5L99UIMP5ueO4Kb9CaoXwQ2R6/qFo/agIgEX36DizdKBbjhGA8ENW+tAQ66t7ly94tY4EsFzO6iG8wDQYJKoZIhvcNAQELBQADggEBAErDhvkrq5HyWuTsgbW9R1CcTr23+wCI96mw23iWzVwLM+aiB6uFMIH93upA31i8sGiFwsdqwXjXtZyEogwJMktA5hbmO9UXgSMuo+RGwoy8xmP+skySqguD4GIZJdWENM3xPCwjI2O7uE3tXoMrCLbSU3a/0RG6dhLiMBDiZJZhMkcKIVZjc0I/CibQSwELCD6kGrAALA2iPAOxbABym1ehd6X4gV/9Vc75JrogEw4lZIodvOQ5JDWOPctuXCuuR+azNdseDGAowSv94zhaYz78+KdUsiYzTSGjG3lNPf7G4pzZdgT4YrnSLAuPiRcARs2o85o5sy+GfkiRsiTYKDk='
+        }
+      }      
+      {
+        name: 'EXCH_IIS_Int_Cert_1'
+        properties:{
+          data: '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'
         }
       }
     ]         
@@ -560,6 +566,37 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           requireServerNameIndication: false          
         }
       } 
+      {
+        name: 'EXCH_HTTP_80_Listener'
+        properties: {
+          hostName: 'mail.gaw00.tk'                      
+          frontendIPConfiguration: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', '${service}_AppGW', '${service}_PublicFrontendIp')
+          }
+          frontendPort: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', '${service}_AppGW', 'HTTP80')
+          }
+          protocol: 'Http'
+          requireServerNameIndication: false          
+        }
+      }
+      {
+        name: 'EXCH_HTTPS_443_Listener'
+        properties: {
+          hostName: 'mail.gaw00.tk'            
+          frontendIPConfiguration: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', '${service}_AppGW', '${service}_PublicFrontendIp')
+          }
+          frontendPort: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', '${service}_AppGW', 'HTTPS443')
+          }
+          protocol: 'Https'
+          requireServerNameIndication: false  
+          sslCertificate:{
+            id: '${appgw_id}/sslCertificates/SSL_Cert_Ext_WildName'
+          }        
+        }
+      }
     ]    
     requestRoutingRules: [
       {
@@ -612,21 +649,59 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties: {          
           ruleType: 'Basic'
           redirectConfiguration:{
-            id:'${appgw_id}/redirectConfigurations/HTTP_to_HTTPS'
+            id:'${appgw_id}/redirectConfigurations/CA_HTTP_to_HTTPS'
           }
           httpListener: {
             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', '${service}_AppGW', 'CA_HTTP_80_Listener')
           }         
         }
-      }      
+      }     
+      {
+        name: 'EXCH_HTTPS_RoutingRule'
+        properties: {          
+          ruleType: 'Basic'
+          httpListener: {
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', '${service}_AppGW', 'EXCH_HTTPS_443_Listener')
+          }
+          backendAddressPool: {
+            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', '${service}_AppGW', 'EXCH_Pool')
+          }
+          backendHttpSettings: {
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', '${service}_AppGW', 'OWA_HTTPS_Settings_1')
+          }
+        }
+      }
+      {
+        name: 'EXCH_HTTP_RoutingRule'
+        properties: {          
+          ruleType: 'Basic'
+          redirectConfiguration:{
+            id:'${appgw_id}/redirectConfigurations/EXCH_HTTP_to_HTTPS'
+          }
+          httpListener: {
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', '${service}_AppGW', 'EXCH_HTTP_80_Listener')
+          }         
+        }
+      }    
     ]
     redirectConfigurations:[
       {
-        name: 'HTTP_to_HTTPS'
+        name: 'EXCH_HTTP_to_HTTPS'
         properties:{
           redirectType: 'Permanent'
           targetListener:{
-            id: '${appgw_id}/httpListeners/CA_HTTPS_443_Listener'            
+            id: '${appgw_id}/httpListeners/EXCH_HTTPS_443_Listener'            
+          }
+          includePath:true
+          includeQueryString:true
+        }
+      }
+      {
+        name: 'EXCH_HTTP_to_HTTPS'
+        properties:{
+          redirectType: 'Permanent'
+          targetListener:{
+            id: '${appgw_id}/httpListeners/EXCH_HTTPS_443_Listener'            
           }
           includePath:true
           includeQueryString:true
