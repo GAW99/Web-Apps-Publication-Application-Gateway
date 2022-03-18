@@ -271,7 +271,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         name:'CA_HTTP_Probe_1'        
         properties:{
           pickHostNameFromBackendHttpSettings: true
-          path: '/hosting/discovery'
+          path: '/certsrv'
           protocol: 'Http'   
           timeout: 30
           interval:30
@@ -343,7 +343,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties:{
           protocol: 'Https'
           port: 443
-          pickHostNameFromBackendAddress: true           
+          pickHostNameFromBackendAddress: true
           probe:{
             id: '${appgw_id}/probes/OAB_HTTPS_Probe_1'
           }
@@ -423,7 +423,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties:{
           protocol: 'Https'
           port: 443
-          pickHostNameFromBackendAddress: true           
+          pickHostNameFromBackendAddress: false           
           probe:{
             id: '${appgw_id}/probes/ECP_HTTPS_Probe_1'
           }
@@ -439,7 +439,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties:{
           protocol: 'Https'
           port: 443
-          pickHostNameFromBackendAddress: true           
+          pickHostNameFromBackendAddress: false           
           probe:{
             id: '${appgw_id}/probes/OWA_HTTPS_Probe_1'
           }
@@ -455,7 +455,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties:{
           protocol: 'Https'
           port: 443
-          pickHostNameFromBackendAddress: true           
+          pickHostNameFromBackendAddress: false           
           probe:{
             id: '${appgw_id}/probes/Autodiscover_HTTPS_Probe_1'
           }
@@ -686,7 +686,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
     ]
     redirectConfigurations:[
       {
-        name: 'EXCH_HTTP_to_HTTPS'
+        name: 'CA_HTTP_to_HTTPS'
         properties:{
           redirectType: 'Permanent'
           targetListener:{
