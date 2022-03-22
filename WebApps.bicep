@@ -493,7 +493,6 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         }
       }     
     ]
-
     authenticationCertificates:[
       {
         name: 'OOS_Cert'
