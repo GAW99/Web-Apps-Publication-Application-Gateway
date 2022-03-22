@@ -9,4 +9,7 @@ Connect-AzAccount -Subscription d8274949-d913-4075-9b9c-d3a839fb5a30
 New-AzResourceGroupDeployment -Name AppGateway1 -ResourceGroupName "WebAppsGWRG-northeurope" -TemplateFile ".\WebApps.bicep" `
 -Mode Incremental -Service "WebAppsGW" -TemplateParameterFile ".\WebApps.parameters.json" #-whatif
 
+New-AzResourceGroupDeployment -Name AppGateway1 -ResourceGroupName "WebAppsGWRG-northeurope" -TemplateFile ".\DeployAll.bicep" `
+-Mode Incremental -Service "WebAppsGW" -TemplateParameterFile ".\WebApps.parameters.json" -whatif
+
 #New-AzResourceGroupDeployment -Name test2 -ResourceGroupName "WebAppsGWRG-northeurope" -TemplateFile ".\Test.bicep" -Mode Incremental 
