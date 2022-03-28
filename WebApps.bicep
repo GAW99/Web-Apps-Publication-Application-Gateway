@@ -15,11 +15,6 @@ param WildnameCertificate object
 
 var appgw_id = resourceId('Microsoft.Network/applicationGateways', '${service}_AppGW')
 
-resource sa 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
-  name: 'testbicepstatic'
-  scope: resourceGroup('05c55d9c-2fdd-49ca-9011-4dc4a28d50a5','TestingStaticWeb')
-}
-
 resource virtualnetname 'Microsoft.Network/virtualNetworks@2021-05-01' existing  = {
   name: 'HUBVNet'  
   scope: resourceGroup('d8274949-d913-4075-9b9c-d3a839fb5a30','NetworkRG-NorthEU')
@@ -65,7 +60,8 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         name: '${service}_PublicFrontendIp'
         properties: {          
           publicIPAddress: {
-            id: resourceId('Microsoft.Network/publicIPAddresses', publicIPAddress.name)
+            //id: resourceId('Microsoft.Network/publicIPAddresses', publicIPAddress.name)
+            id: publicIPAddress.id
           }         
         }
       }      
@@ -628,6 +624,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           hostName: 'Autodiscover.gaw00.tk'                      
           frontendIPConfiguration: {
             id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', '${service}_AppGW', '${service}_PublicFrontendIp')
+            
           }
           frontendPort: {
             id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', '${service}_AppGW', 'HTTP80')
@@ -813,3 +810,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
     //publicIPAddress
   ]
 }
+
+output IP string = publicIPAddress.properties.ipAddress
+
+

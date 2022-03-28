@@ -21,3 +21,6 @@ module AppGW '../26/WebApps.bicep' = {
     WildnameCertificate:WildnameCertificate
   }
 }
+
+output IP string = AppGW.outputs.IP
+
