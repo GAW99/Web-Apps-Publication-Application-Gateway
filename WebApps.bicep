@@ -812,5 +812,4 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
 }
 
 output IP string = publicIPAddress.properties.ipAddress
-
-
+output IPAddressHostName string = publicIPAddress.properties.dnsSettings.fqdn

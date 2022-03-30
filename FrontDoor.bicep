@@ -28,6 +28,15 @@ resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
   }
 }
 
+resource OOS_Endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
+  name: 'OOS-Endpoint'
+  parent: FD
+  location: 'global'
+  properties: {
+    enabledState: 'Enabled'
+  }
+}
+
 resource originGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
   name: '${service}-OriginGroup'
   parent: FD
@@ -51,10 +60,41 @@ resource origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
   parent: originGroup
   properties: {
     hostName: replace(replace(sa.properties.primaryEndpoints.web,'https://',''),'/','')
-    //sa.properties.primaryEndpoints.web
 //    httpPort: 80
     httpsPort: 443
     originHostHeader: replace(replace(sa.properties.primaryEndpoints.web,'https://',''),'/','')
+    priority: 1
+    weight: 1000
+  }
+}
+
+resource OOS_Origin_Group 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
+  name: 'OOS-Origin-Group'
+  parent: FD
+  properties: {    
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+      additionalLatencyInMilliseconds: 0
+    }
+    healthProbeSettings: {
+      probePath: '/hosting/discovery'
+      probeRequestType: 'HEAD'
+      probeProtocol: 'Https'
+      probeIntervalInSeconds: 10
+    }
+  }
+}
+
+resource OOS1_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
+  name: 'OOS1-Origin'
+  parent: OOS_Origin_Group
+  properties: {
+    hostName: 'webappsgw.gaw00.tk'
+    //bb1db0a6-0ba8-4d8b-996a-276a1af10a21.cloudapp.net
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: 'oos-f1.gaw00.tk'
     priority: 1
     weight: 1000
   }
@@ -87,6 +127,9 @@ resource CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
   name: 'CustomDoamin1'
   parent: FD
   properties: {
+    azureDnsZone: {
+       id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
+    }
     hostName: 'fd.gaw00.tk'
     tlsSettings: {
       certificateType: 'CustomerCertificate'
@@ -95,6 +138,52 @@ resource CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
         id: secret.id
       }
     }
+  }
+}
+
+resource OOS_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
+  name: 'OOS-CustomDomain'
+  parent: FD
+  properties: {
+    azureDnsZone: {
+       id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
+    }
+    hostName: 'oos-t.gaw00.tk'
+    tlsSettings: {
+      certificateType: 'CustomerCertificate'
+      minimumTlsVersion: 'TLS12'
+      secret: {
+        id: secret.id
+      }
+    }
+  }
+}
+
+resource OOS_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
+  name: 'OOS-Route'
+  parent: OOS_Endpoint
+  dependsOn:[
+    OOS1_Origin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
+  ]
+  properties: {    
+    originGroup: {
+      id: OOS_Origin_Group.id
+    }
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*'
+    ]
+    forwardingProtocol: 'MatchRequest'
+    linkToDefaultDomain: 'Enabled'
+    //httpsRedirect: 'Enabled'
+    customDomains:[
+      {
+        id:OOS_CustomDomain.id
+      }
+    ]
   }
 }
 
@@ -118,9 +207,13 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
     forwardingProtocol: 'HttpsOnly'
     linkToDefaultDomain: 'Enabled'
     httpsRedirect: 'Enabled'
+    customDomains:[
+      {
+        id:CustomDomain.id
+      }
+    ]
   }
 }
 
 output frontDoorEndpointHostName string = endpoint.properties.hostName
 output result1 string = fd_id
-output result2 string = 'Microsoft.Network/applicationGateways/${service}-FD'

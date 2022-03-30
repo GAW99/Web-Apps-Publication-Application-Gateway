@@ -23,4 +23,5 @@ module AppGW '../26/WebApps.bicep' = {
 }
 
 output IP string = AppGW.outputs.IP
+output IPAddressHostName string = AppGW.outputs.IPAddressHostName
 
