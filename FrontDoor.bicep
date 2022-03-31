@@ -3,6 +3,11 @@
 @description('Prefix will be used in names of resources')
 param service string 
 
+//param WEBAppsIP1 string
+param WEBAppsIPs array
+
+param PublicCertID string
+
 var fd_id = resourceId('Microsoft.Network/applicationGateways', '${service}-FD')
 
 resource sa 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
@@ -86,27 +91,26 @@ resource OOS_Origin_Group 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
   }
 }
 
-resource OOS1_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
-  name: 'OOS1-Origin'
+resource OOS1_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)-1): {
+  name: 'OOS1-Origin-${i+1}'
   parent: OOS_Origin_Group
   properties: {
-    hostName: 'webappsgw.gaw00.tk'
-    //bb1db0a6-0ba8-4d8b-996a-276a1af10a21.cloudapp.net
+    hostName: WEBAppsIPs[i]
     httpPort: 80
     httpsPort: 443
     originHostHeader: 'oos-f1.gaw00.tk'
     priority: 1
     weight: 1000
   }
-}
-
+}]
+/*
 resource KeyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
   scope: resourceGroup('KeyVaultRG-NorthEU')
   name: 'KeyStorage01'
   resource secret 'secrets' existing = {
     name: '20220214-Common-Certificate-chain'
   }
-}
+}*/
 
 resource secret 'Microsoft.Cdn/profiles/secrets@2021-06-01' = {
   name: '${service}-Certif'
@@ -117,7 +121,8 @@ resource secret 'Microsoft.Cdn/profiles/secrets@2021-06-01' = {
       useLatestVersion: true
       secretVersion: ''
       secretSource: {
-        id: KeyVault::secret.id
+        //id: KeyVault::secret.id
+        id: PublicCertID
       }
     }
   }
