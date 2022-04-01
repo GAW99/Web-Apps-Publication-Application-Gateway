@@ -3,10 +3,11 @@
 @description('Prefix will be used in names of resources')
 param service string 
 
-//param WEBAppsIP1 string
 param WEBAppsIPs array
 
 param PublicCertID string
+
+param AzureDNSZoneID string
 
 var fd_id = resourceId('Microsoft.Network/applicationGateways', '${service}-FD')
 
@@ -133,7 +134,8 @@ resource CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
   parent: FD
   properties: {
     azureDnsZone: {
-       id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
+       //id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
+       id: AzureDNSZoneID
     }
     hostName: 'fd.gaw00.tk'
     tlsSettings: {
@@ -151,7 +153,8 @@ resource OOS_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
   parent: FD
   properties: {
     azureDnsZone: {
-       id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
+      // id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
+      id: AzureDNSZoneID
     }
     hostName: 'oos-t.gaw00.tk'
     tlsSettings: {
@@ -220,5 +223,17 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   }
 }
 
-output frontDoorEndpointHostName string = endpoint.properties.hostName
+output frontDoorEndpointHostNames array = [
+  endpoint.properties.hostName
+  OOS_Endpoint.properties.hostName
+]
 output result1 string = fd_id
+output CustomDomainNames array = [
+  substring(OOS_CustomDomain.properties.hostName,0,indexOf(OOS_CustomDomain.properties.hostName,'.'))
+  substring(CustomDomain.properties.hostName,0,indexOf(CustomDomain.properties.hostName,'.'))
+]
+
+output CustomDomainValidation array = [
+  OOS_CustomDomain.properties.validationProperties.validationToken
+  CustomDomain.properties.validationProperties.validationToken
+]

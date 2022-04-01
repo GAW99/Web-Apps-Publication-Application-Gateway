@@ -790,24 +790,12 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           includeQueryString:true
         }
       }
-     /* {
-        name: 'Autodiscover_HTTP_to_HTTPS'
-        properties:{
-          redirectType: 'Permanent'
-          targetListener:{
-            id: '${appgw_id}/httpListeners/Autodiscover_HTTPS_443_Listener'            
-          }
-          includePath:true
-          includeQueryString:true
-        }
-      }*/
     ]
     enableHttp2: false    
   }
 
   dependsOn: [
     virtualnetname
-    //publicIPAddress
   ]
 }
 
