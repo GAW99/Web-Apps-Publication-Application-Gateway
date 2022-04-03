@@ -9,6 +9,8 @@ param PublicCertID string
 
 param AzureDNSZoneID string
 
+param AzureDNSZoneName string
+
 var fd_id = resourceId('Microsoft.Network/applicationGateways', '${service}-FD')
 
 resource sa 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
@@ -148,12 +150,23 @@ resource CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
   }
 }
 
+module CustomDNSRecords 'FDDNSRecords.bicep' =  {
+  name:'CustomDNSRecords'
+  scope: resourceGroup('DNSRG-NorthEU')
+  params: {
+    HostName: CustomDomain.properties.hostName   
+    ValidationData: CustomDomain.properties.validationProperties.validationToken
+    Target: endpoint.properties.hostName
+    AzureDNSZoneID: AzureDNSZoneName
+    //AzureDNSZoneName: 'gaw00.tk'
+  }
+}
+
 resource OOS_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
   name: 'OOS-CustomDomain'
   parent: FD
   properties: {
     azureDnsZone: {
-      // id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
       id: AzureDNSZoneID
     }
     hostName: 'oos-t.gaw00.tk'
@@ -164,6 +177,18 @@ resource OOS_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
         id: secret.id
       }
     }
+  }
+}
+
+module OOSDNSRecords 'FDDNSRecords.bicep' =  {
+  name:'OOSDNSRecords'
+  scope: resourceGroup('DNSRG-NorthEU')
+  params: {
+    HostName: OOS_CustomDomain.properties.hostName   
+    ValidationData: OOS_CustomDomain.properties.validationProperties.validationToken
+    Target: OOS_Endpoint.properties.hostName
+    AzureDNSZoneID: AzureDNSZoneName
+    //AzureDNSZoneName: 'gaw00.tk'
   }
 }
 
@@ -237,3 +262,5 @@ output CustomDomainValidation array = [
   OOS_CustomDomain.properties.validationProperties.validationToken
   CustomDomain.properties.validationProperties.validationToken
 ]
+
+output OOSCustomDoamin string = OOS_CustomDomain.properties.hostName
