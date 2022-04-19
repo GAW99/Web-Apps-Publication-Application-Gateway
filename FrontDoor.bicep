@@ -46,6 +46,15 @@ resource OOS_Endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
   }
 }
 
+resource Autodiscover_Endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
+  name: 'Autodiscover-Endpoint'
+  parent: FD
+  location: 'global'
+  properties: {
+    enabledState: 'Enabled'
+  }
+}
+
 resource originGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
   name: '${service}-OriginGroup'
   parent: FD
@@ -108,6 +117,37 @@ resource OOS1_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = 
   }
 }]
 
+resource Autodiscover_Origin_Group 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
+  name: 'Autodiscover-Origin-Group'
+  parent: FD
+  properties: {    
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+      additionalLatencyInMilliseconds: 0
+    }
+    healthProbeSettings: {
+      probePath: '/Autodiscover/healthcheck.htm'
+      probeRequestType: 'HEAD'
+      probeProtocol: 'Https'
+      probeIntervalInSeconds: 10
+    }
+  }
+}
+
+resource Autodiscover_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)-1): {
+  name: 'Autodiscover-Origin-${i+1}'
+  parent: Autodiscover_Origin_Group
+  properties: {
+    hostName: WEBAppsIPs[i]
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: 'Autodiscover.gaw00.tk'
+    priority: 1
+    weight: 1000
+  }
+}]
+
 resource secret 'Microsoft.Cdn/profiles/secrets@2021-06-01' = {
   name: '${service}-Certif'
   parent: FD
@@ -149,6 +189,34 @@ module CustomDNSRecords 'FDDNSRecords.bicep' =  {
     ValidationData: CustomDomain.properties.validationProperties.validationToken
     Target: endpoint.properties.hostName
     AzureDNSZoneID: AzureDNSZoneName
+  }
+}
+
+resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
+  name: 'TestRoute'
+  parent: endpoint
+  dependsOn:[
+    origin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
+  ]
+  properties: {    
+    originGroup: {
+      id: originGroup.id
+    }
+    supportedProtocols: [
+     // 'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*'
+    ]
+    forwardingProtocol: 'HttpsOnly'
+    linkToDefaultDomain: 'Enabled'
+    httpsRedirect: 'Enabled'
+    customDomains:[
+      {
+        id:CustomDomain.id
+      }
+    ]
   }
 }
 
@@ -209,33 +277,64 @@ resource OOS_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   }
 }
 
-resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
-  name: 'TestRoute'
-  parent: endpoint
+resource Autodiscover_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
+  name: 'Autodiscover-CustomDomain'
+  parent: FD
+  properties: {
+    azureDnsZone: {
+      id: AzureDNSZoneID
+    }
+    hostName: 'Autodiscover.gaw00.tk'
+    tlsSettings: {
+      certificateType: 'CustomerCertificate'
+      minimumTlsVersion: 'TLS12'
+      secret: {
+        id: secret.id
+      }
+    }
+  }
+}
+
+module AutodiscoverDNSRecords 'FDDNSRecords.bicep' =  {
+  name:'AutodiscoverDNSRecords'
+  scope: resourceGroup('DNSRG-NorthEU')
+  params: {
+    HostName: Autodiscover_CustomDomain.properties.hostName   
+    ValidationData: Autodiscover_CustomDomain.properties.validationProperties.validationToken
+    Target: Autodiscover_Endpoint.properties.hostName
+    AzureDNSZoneID: AzureDNSZoneName
+  }
+}
+
+resource Autodiscover_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
+  name: 'Autodiscover-Route'
+  parent: Autodiscover_Endpoint
   dependsOn:[
-    origin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
+    Autodiscover_Origin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
   ]
   properties: {    
     originGroup: {
-      id: originGroup.id
+      id: Autodiscover_Origin_Group.id
     }
     supportedProtocols: [
-     // 'Http'
+      'Http'
       'Https'
     ]
     patternsToMatch: [
       '/*'
     ]
-    forwardingProtocol: 'HttpsOnly'
+    forwardingProtocol: 'MatchRequest'
     linkToDefaultDomain: 'Enabled'
-    httpsRedirect: 'Enabled'
+    //httpsRedirect: 'Enabled'
     customDomains:[
       {
-        id:CustomDomain.id
+        id:Autodiscover_CustomDomain.id
       }
     ]
   }
 }
+
+
 
 output frontDoorEndpointHostNames array = [
   endpoint.properties.hostName

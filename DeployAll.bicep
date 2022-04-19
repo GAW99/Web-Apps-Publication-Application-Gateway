@@ -33,7 +33,7 @@ resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
 
 var PublicCertID = KeyVault::secret.id
 
-module AppGW '../26/WebApps.bicep' = {
+module AppGW 'WebApps.bicep' = {
   name: 'WebAppsGatewayDeployment'
   scope: resourceGroup('WebAppsGWRG-northeurope')
   params: {
@@ -45,10 +45,9 @@ module AppGW '../26/WebApps.bicep' = {
 
 var FDBackendIPs =  [
   AppGW.outputs.IP
-  AppGW.outputs.IP
   ] 
 
-module FD '../26/FrontDoor.bicep' = {
+module FD 'FrontDoor.bicep' = {
   name: 'FrontDoorDeployment'
   scope: resourceGroup('FDRG-northeurope')
   params: {
