@@ -27,6 +27,7 @@ resource FD 'Microsoft.Cdn/profiles@2021-06-01' = {
       name:'Standard_AzureFrontDoor'
     }
 }
+
 resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
   name: '${service}-Endpoint'
   parent: FD
@@ -106,14 +107,6 @@ resource OOS1_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = 
     weight: 1000
   }
 }]
-/*
-resource KeyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
-  scope: resourceGroup('KeyVaultRG-NorthEU')
-  name: 'KeyStorage01'
-  resource secret 'secrets' existing = {
-    name: '20220214-Common-Certificate-chain'
-  }
-}*/
 
 resource secret 'Microsoft.Cdn/profiles/secrets@2021-06-01' = {
   name: '${service}-Certif'
@@ -124,7 +117,6 @@ resource secret 'Microsoft.Cdn/profiles/secrets@2021-06-01' = {
       useLatestVersion: true
       secretVersion: ''
       secretSource: {
-        //id: KeyVault::secret.id
         id: PublicCertID
       }
     }
@@ -136,7 +128,6 @@ resource CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
   parent: FD
   properties: {
     azureDnsZone: {
-       //id: '/subscriptions/d8274949-d913-4075-9b9c-d3a839fb5a30/resourceGroups/dnsrg-northeu/providers/Microsoft.Network/dnszones/gaw00.tk'
        id: AzureDNSZoneID
     }
     hostName: 'fd.gaw00.tk'
@@ -158,7 +149,6 @@ module CustomDNSRecords 'FDDNSRecords.bicep' =  {
     ValidationData: CustomDomain.properties.validationProperties.validationToken
     Target: endpoint.properties.hostName
     AzureDNSZoneID: AzureDNSZoneName
-    //AzureDNSZoneName: 'gaw00.tk'
   }
 }
 
@@ -169,7 +159,7 @@ resource OOS_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
     azureDnsZone: {
       id: AzureDNSZoneID
     }
-    hostName: 'oos-t.gaw00.tk'
+    hostName: 'oos-f1.gaw00.tk'
     tlsSettings: {
       certificateType: 'CustomerCertificate'
       minimumTlsVersion: 'TLS12'
@@ -188,7 +178,6 @@ module OOSDNSRecords 'FDDNSRecords.bicep' =  {
     ValidationData: OOS_CustomDomain.properties.validationProperties.validationToken
     Target: OOS_Endpoint.properties.hostName
     AzureDNSZoneID: AzureDNSZoneName
-    //AzureDNSZoneName: 'gaw00.tk'
   }
 }
 

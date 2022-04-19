@@ -29,9 +29,7 @@ resource KeyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
 resource dnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
   name: 'gaw00.tk'
   scope: resourceGroup('dnsrg-northeu')
-  //location: 'global'
 }
-
 
 var PublicCertID = KeyVault::secret.id
 
@@ -54,7 +52,6 @@ module FD '../26/FrontDoor.bicep' = {
   name: 'FrontDoorDeployment'
   scope: resourceGroup('FDRG-northeurope')
   params: {
-//    location:location
     service: FDService
     WEBAppsIPs:FDBackendIPs
     PublicCertID:PublicCertID
@@ -63,12 +60,6 @@ module FD '../26/FrontDoor.bicep' = {
   }
 }
 
-
-
-//output IP string = AppGW.outputs.IP
-//output IPAddressHostName string = AppGW.outputs.IPAddressHostName
-
 output HostNames array = FD.outputs.CustomDomainNames
 output HostNamesValidation array = FD.outputs.CustomDomainValidation
 output TargetEndpoints array = FD.outputs.frontDoorEndpointHostNames
-//output DNSData string = dnsZone.id

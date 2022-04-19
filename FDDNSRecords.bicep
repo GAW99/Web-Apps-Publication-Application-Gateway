@@ -1,11 +1,9 @@
 param AzureDNSZoneID string
 param ValidationData string
-//param AzureDNSZoneName string
 param HostName string
 param Target string
 
 resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2018-05-01' = {
-  //name: '${AzureDNSZoneID}/${HostName}'
   name: '${AzureDNSZoneID}/${substring(HostName,0,indexOf(HostName,'.'))}'
   properties: {
     TTL: 3600
@@ -16,7 +14,6 @@ resource cnameRecord 'Microsoft.Network/dnsZones/CNAME@2018-05-01' = {
 }
 
 resource validationTxtRecord 'Microsoft.Network/dnsZones/TXT@2018-05-01' = {
-  //name: '${AzureDNSZoneID}/_dnsauth.${HostName}'
   name: '${AzureDNSZoneID}/_dnsauth.${substring(HostName,0,indexOf(HostName,'.'))}'
   properties: {
     TTL: 1000

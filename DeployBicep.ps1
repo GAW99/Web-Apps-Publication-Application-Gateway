@@ -9,8 +9,10 @@ Connect-AzAccount -Subscription d8274949-d913-4075-9b9c-d3a839fb5a30
 New-AzResourceGroupDeployment -Name AppGateway1 -ResourceGroupName "WebAppsGWRG-northeurope" -TemplateFile ".\WebApps.bicep" `
 -Mode Incremental -Service "WebAppsGW" -TemplateParameterFile ".\WebApps.parameters.json" #-whatif
 
-New-AzResourceGroupDeployment -Name AllDeploy -ResourceGroupName "WebAppsGWRG-northeurope" -TemplateFile ".\DeployAll.bicep" `
--Mode Incremental -WebAppGWService "WebAppsGW" -TemplateParameterFile ".\DeployAll.parameters.json" -FDService "FrontDoor"  #-whatif
+(New-AzResourceGroupDeployment -Name AllDeploy -ResourceGroupName "WebAppsGWRG-northeurope" -TemplateFile ".\DeployAll.bicep" `
+-Mode Incremental -WebAppGWService "WebAppsGW" -TemplateParameterFile ".\DeployAll.parameters.json" -FDService "FrontDoor" ).ProvisioningState
+
+#$result.ProvisioningState
 
 #Register App
 New-AzADServicePrincipal -ApplicationId "205478c0-bd83-4e1b-a9d6-db63a3e1e1c8"
