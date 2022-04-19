@@ -432,6 +432,103 @@ resource OWA_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   }
 }
 
+//CA.gaw00.tk Area
+resource CA_Endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
+  name: 'CA-Endpoint'
+  parent: FD
+  location: 'global'
+  properties: {
+    enabledState: 'Enabled'
+  }
+}
+
+resource CA_Origin_Group 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
+  name: 'CA-Origin-Group'
+  parent: FD
+  properties: {    
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+      additionalLatencyInMilliseconds: 0
+    }
+    healthProbeSettings: {
+      probePath: '/certsrv'
+      probeRequestType: 'HEAD'
+      probeProtocol: 'Http'
+      probeIntervalInSeconds: 10
+    }
+  }
+}
+
+resource CA_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)): {
+  name: 'CA-Origin-${i+1}'
+  parent: CA_Origin_Group
+  properties: {
+    hostName: WEBAppsIPs[i]
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: 'ca.gaw00.tk'
+    priority: 1
+    weight: 1000
+  }
+}]
+
+resource CA_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
+  name: 'CA-CustomDomain'
+  parent: FD
+  properties: {
+    azureDnsZone: {
+      id: AzureDNSZoneID
+    }
+    hostName: 'ca.gaw00.tk'
+    tlsSettings: {
+      certificateType: 'CustomerCertificate'
+      minimumTlsVersion: 'TLS12'
+      secret: {
+        id: secret.id
+      }
+    }
+  }
+}
+
+module CADNSRecords 'FDDNSRecords.bicep' =  {
+  name:'CADNSRecords'
+  scope: resourceGroup('DNSRG-NorthEU')
+  params: {
+    HostName: CA_CustomDomain.properties.hostName   
+    ValidationData: CA_CustomDomain.properties.validationProperties.validationToken
+    Target: CA_Endpoint.properties.hostName
+    AzureDNSZoneID: AzureDNSZoneName
+  }
+}
+
+resource CA_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
+  name: 'CA-Route'
+  parent: CA_Endpoint
+  dependsOn:[
+    CA_Origin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
+  ]
+  properties: {    
+    originGroup: {
+      id: CA_Origin_Group.id
+    }
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*'
+    ]
+    forwardingProtocol: 'MatchRequest'
+    linkToDefaultDomain: 'Enabled'
+    //httpsRedirect: 'Enabled'
+    customDomains:[
+      {
+        id:CA_CustomDomain.id
+      }
+    ]
+  }
+}
 
 output frontDoorEndpointHostNames array = [
   endpoint.properties.hostName
