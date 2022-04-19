@@ -104,7 +104,7 @@ resource OOS_Origin_Group 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
   }
 }
 
-resource OOS1_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)-1): {
+resource OOS1_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)): {
   name: 'OOS1-Origin-${i+1}'
   parent: OOS_Origin_Group
   properties: {
@@ -135,7 +135,7 @@ resource Autodiscover_Origin_Group 'Microsoft.Cdn/profiles/originGroups@2021-06-
   }
 }
 
-resource Autodiscover_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)-1): {
+resource Autodiscover_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)): {
   name: 'Autodiscover-Origin-${i+1}'
   parent: Autodiscover_Origin_Group
   properties: {
@@ -334,6 +334,103 @@ resource Autodiscover_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-
   }
 }
 
+//mail.gaw00.tk Area
+resource OWA_Endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2021-06-01' = {
+  name: 'OWA-Endpoint'
+  parent: FD
+  location: 'global'
+  properties: {
+    enabledState: 'Enabled'
+  }
+}
+
+resource OWA_Origin_Group 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
+  name: 'OWA-Origin-Group'
+  parent: FD
+  properties: {    
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+      additionalLatencyInMilliseconds: 0
+    }
+    healthProbeSettings: {
+      probePath: '/OWA/healthcheck.htm'
+      probeRequestType: 'HEAD'
+      probeProtocol: 'Https'
+      probeIntervalInSeconds: 10
+    }
+  }
+}
+
+resource OWA_Origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = [for i in range(0, length(WEBAppsIPs)): {
+  name: 'OWA-Origin-${i+1}'
+  parent: OWA_Origin_Group
+  properties: {
+    hostName: WEBAppsIPs[i]
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: 'mail.gaw00.tk'
+    priority: 1
+    weight: 1000
+  }
+}]
+
+resource OWA_CustomDomain 'Microsoft.Cdn/profiles/customDomains@2021-06-01' = {
+  name: 'OWA-CustomDomain'
+  parent: FD
+  properties: {
+    azureDnsZone: {
+      id: AzureDNSZoneID
+    }
+    hostName: 'mail.gaw00.tk'
+    tlsSettings: {
+      certificateType: 'CustomerCertificate'
+      minimumTlsVersion: 'TLS12'
+      secret: {
+        id: secret.id
+      }
+    }
+  }
+}
+
+module OWADNSRecords 'FDDNSRecords.bicep' =  {
+  name:'OWADNSRecords'
+  scope: resourceGroup('DNSRG-NorthEU')
+  params: {
+    HostName: OWA_CustomDomain.properties.hostName   
+    ValidationData: OWA_CustomDomain.properties.validationProperties.validationToken
+    Target: OWA_Endpoint.properties.hostName
+    AzureDNSZoneID: AzureDNSZoneName
+  }
+}
+
+resource OWA_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
+  name: 'OWA-Route'
+  parent: OWA_Endpoint
+  dependsOn:[
+    OWA_Origin // This explicit dependency is required to ensure that the origin group is not empty when the route is created.
+  ]
+  properties: {    
+    originGroup: {
+      id: OWA_Origin_Group.id
+    }
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*'
+    ]
+    forwardingProtocol: 'MatchRequest'
+    linkToDefaultDomain: 'Enabled'
+    httpsRedirect: 'Enabled'
+    customDomains:[
+      {
+        id:OWA_CustomDomain.id
+      }
+    ]
+  }
+}
 
 
 output frontDoorEndpointHostNames array = [
