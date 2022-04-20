@@ -773,7 +773,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties:{
           redirectType: 'Permanent'
           targetListener:{
-            id: '${appgw_id}/httpListeners/EXCH_HTTPS_443_Listener'            
+            id: '${appgw_id}/httpListeners/CA_HTTPS_443_Listener'            
           }
           includePath:true
           includeQueryString:true

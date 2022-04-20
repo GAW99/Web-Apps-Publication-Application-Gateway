@@ -517,7 +517,7 @@ resource CA_Route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
       'Https'
     ]
     patternsToMatch: [
-      '/*'
+      '/certsrv'
     ]
     forwardingProtocol: 'MatchRequest'
     linkToDefaultDomain: 'Enabled'
