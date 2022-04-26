@@ -60,7 +60,6 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         name: '${service}_PublicFrontendIp'
         properties: {          
           publicIPAddress: {
-            //id: resourceId('Microsoft.Network/publicIPAddresses', publicIPAddress.name)
             id: publicIPAddress.id
           }         
         }
@@ -249,7 +248,12 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           protocol: 'Https'   
           timeout: 30
           interval:30
-          unhealthyThreshold: 5          
+          unhealthyThreshold: 5     
+          match:{
+            statusCodes:[
+              '200-403'
+            ]
+          }     
         }
       }
       {
@@ -260,14 +264,19 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           protocol: 'Http'   
           timeout: 30
           interval:30
-          unhealthyThreshold: 5          
+          unhealthyThreshold: 5   
+          match:{
+            statusCodes:[
+              '200-403'
+            ]
+          }  
         }
       }
       {
         name:'CA_HTTPS_Probe'     
         properties:{
           pickHostNameFromBackendHttpSettings: true
-          path: '/certsrv'
+          path: '/'
           protocol: 'Https'   
           timeout: 30
           interval:30
@@ -278,11 +287,11 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         name:'CA_HTTP_Probe'        
         properties:{
           pickHostNameFromBackendHttpSettings: true
-          path: '/certsrv'
+          path: '/'
           protocol: 'Http'   
           timeout: 30
           interval:30
-          unhealthyThreshold: 5          
+          unhealthyThreshold: 5    
         }
       }      
     ]    
@@ -322,7 +331,8 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           port: 80          
           protocol: 'Http'
           cookieBasedAffinity: 'Disabled'
-          pickHostNameFromBackendAddress: true
+          pickHostNameFromBackendAddress: false
+          hostName: 'ca.gaw00.tk'
           requestTimeout: 20  
           probe:{
             id: '${appgw_id}/probes/CA_HTTP_Probe'
@@ -334,13 +344,14 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties:{
           protocol: 'Https'
           port: 443
-          pickHostNameFromBackendAddress: true           
+          pickHostNameFromBackendAddress: false
+          hostName: 'ca.gaw00.tk'
           probe:{
             id: '${appgw_id}/probes/CA_HTTPS_Probe'
           }
           authenticationCertificates: [
             {
-              id: '${appgw_id}/authenticationCertificates/SSL_Cert_Ext_WildName'                          
+              id: '${appgw_id}/authenticationCertificates/CA_Int_Cert'                          
             }
           ]
         }
@@ -693,7 +704,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
             id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', '${service}_AppGW', 'CA_Pool')
           }
           backendHttpSettings: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', '${service}_AppGW', 'CA_HTTP_Settings')
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', '${service}_AppGW', 'CA_HTTPS_Settings')
           }
         }
       }
