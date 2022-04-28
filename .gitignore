@@ -2,4 +2,4 @@
 *.pfx
 *.txt
 WebApps.parameters.json
-/DNSExperiments/*
+DNSExperiments/
