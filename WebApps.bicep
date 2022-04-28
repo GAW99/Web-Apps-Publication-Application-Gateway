@@ -302,7 +302,8 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
           port: 80
           protocol: 'Http'
           cookieBasedAffinity: 'Disabled'
-          pickHostNameFromBackendAddress: true
+          pickHostNameFromBackendAddress: false
+          hostName: 'oos-f1.gaw00.tk'       
           requestTimeout: 20  
           probe:{
             id: '${appgw_id}/probes/OOS_HTTP_Probe'
@@ -314,7 +315,8 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-05-01' =
         properties:{
           protocol: 'Https'
           port: 443
-          pickHostNameFromBackendAddress: true           
+          pickHostNameFromBackendAddress: false
+          hostName: 'oos-f1.gaw00.tk'       
           probe:{
             id: '${appgw_id}/probes/OOS_HTTPS_Probe'
           }
